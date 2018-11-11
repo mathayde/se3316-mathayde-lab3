@@ -11,6 +11,7 @@ var mongoose   = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/fruits',{ useNewUrlParser: true }); // connect to our database
 var Fruit     = require('./fruit');
 
+
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -30,7 +31,10 @@ router.use(function(req, res, next) {
 });
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
-    res.json({ message: 'hooray! welcome to our api!'});
+    var viewall= "<br><form method='get' action='/api/fruits'><button type='submit'>View All</button></form>";
+    var tester="<form method='post' action='/api/fruits'><br>Name:<br><input type='text' name='name' value='Fruit'><br>Price:<br><input type='number' name='price' value=1><br>Tax:<br><input type='number' name='tax' value=1><br><br><button type='submit'>Create New</button></form>";
+    res.status(200);
+    res.set('text/html').send(viewall+tester);
 });
 
 
@@ -41,6 +45,7 @@ router.get('/', function(req, res) {
 // create a fruit (accessed at POST http://localhost:8080/api/fruits)
 router.post('/fruits', function(req, res) {
     var fruit = new Fruit();      // create a new instance of the Fruit model
+    //alert(req.body);
     fruit.name = req.body.name;  // set the fruits name (comes from the request)
     fruit.quantity = 10;  
     fruit.price = req.body.price;  // set the fruits price (comes from the request)
