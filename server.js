@@ -33,10 +33,10 @@ router.use(function(req, res, next) {
 });
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
-    var viewall= "<br><form method='get' action='/api/fruits'><button type='submit'>View All</button></form>";
-    var tester="<form method='post' action='/api/fruits'><br>Name:<br><input type='text' name='name' value='Fruit'><br>Price:<br><input type='number' name='price' value=1><br>Tax:<br><input type='number' name='tax' value=1><br><br><button type='submit'>Create New</button></form>";
+    var viewall= "<br><form method='get' action='/api/fruits'><button type='submit'>View Stock</button></form>";
+    var tester="<form method='post' action='/api/fruits'><br>Name:<br><input type='text' name='name' value='Fruit'><br>Price:<br><input type='number' name='price' value=1><br>Tax:<br><input type='number' name='tax' value=1><br><br><button type='submit'>Create New Inventory</button></form>";
     res.status(200);
-    res.set('text/html').send(viewall+tester);
+    res.set('text/html').send("<title>SE3316 Lab 3</title><h1>Node.js Fruit Inventory API</h1>"+viewall+tester);
 });
 
 
@@ -57,7 +57,7 @@ router.post('/fruits', function(req, res) {
         if (err)
             res.send(err);
         res.status(200);
-        res.set('text/html').send("Fruit created!<br><form method='get' action='/api'><button type='submit'>Back</button></form>");
+        res.set('text/html').send("Stock created!<br><form method='get' action='/api'><button type='submit'>Back</button></form>");
 
     });
 });
@@ -67,7 +67,7 @@ router.get('/fruits/', function(req, res) {
         if (err)
             res.send(err);
         var testing="";
-        for(var i=0;i<fruits.length-1;i++){
+        for(var i=0;i<fruits.length;i++){
             var temp="<a href='/api/fruits/"+fruits[i]._id+"'>"+fruits[i]+"</a><br>"
             testing=testing+temp;
         }
@@ -88,7 +88,9 @@ router.get('/fruits/:fruit_id', function(req, res) {
         if (err)
             res.send(err);
         res.status(200);
-        res.set('text/html').send(fruit+"<br><form method='POST' action='/api/fruits/"+fruit._id+"?_method=DELETE'><button type='submit'>Delete resource</button></form>");
+        res.set('text/html').send("<form method='POST' action='/api/fruits/"+fruit._id+"?_method=PUT'><br>Name:<br><input type='text' name='name' value="+fruit.name+"><br>Quantity:<br><input type='number' name='quantity' value="+fruit.quantity+"><br>Tax:<br><input type='number' name='tax' value="+fruit.tax+"><br><br><button type='submit'>Update</button></form>"+
+        "<form method='POST' action='/api/fruits/"+fruit._id+"?_method=DELETE'><button type='submit'>Delete</button></form>"+
+        "<form method='get' action='/api/fruits'><button type='submit'>Back</button></form>");
     });
 });
 // update the fruit with this id (accessed at PUT http://localhost:8080/api/fruits/:fruit_id)
@@ -103,7 +105,8 @@ router.put('/fruits/:fruit_id', function(req, res) {
         fruit.save(function(err) {
             if (err)
                 res.send(err);
-            res.json({ message: 'Fruit updated!' });
+            res.status(200);
+            res.set('text/html').send("Fruit updated!<br><form method='get' action='/api/fruits'><button type='submit'>Back</button></form>");
         });
     });
 });
@@ -114,7 +117,8 @@ router.delete('/fruits/:fruit_id', function(req, res) {
     }, function(err, fruit) {
         if (err)
             res.send(err);
-        res.json({ message: 'Successfully deleted' });
+        res.status(200);
+        res.set('text/html').send("Successfully deleted.<br><form method='get' action='/api/fruits'><button type='submit'>Back</button></form>");
     });
 });
 
