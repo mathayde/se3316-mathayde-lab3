@@ -11,6 +11,7 @@ var mongoose   = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/fruits',{ useNewUrlParser: true }); // connect to our database
 var Fruit     = require('./fruit');
 var methodOverride = require('method-override');
+var AsyncPolling = require('async-polling');
 
 // override with POST having ?_method=DELETE
 app.use(methodOverride('_method'));
@@ -132,3 +133,10 @@ app.use('/api', router);
 // =============================================================================
 app.listen(port);
 console.log('We are open for business on port ' + port);
+// START THE POLLING
+// =============================================================================
+AsyncPolling(function (end) {
+    //i'm not quite sure what to do with the polling but whatever it woul be would go in this space(what would we check other than the database itself and by what metric would we determine which values are erronous and which are correct)
+    console.log("Async poll completed.")
+    end();
+}, 2000).run();
