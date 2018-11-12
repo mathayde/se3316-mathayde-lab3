@@ -10,8 +10,10 @@ var bodyParser  = require('body-parser');
 var mongoose   = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/fruits',{ useNewUrlParser: true }); // connect to our database
 var Fruit     = require('./fruit');
+var methodOverride = require('method-override');
 
-
+// override with POST having ?_method=DELETE
+app.use(methodOverride('_method'));
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,7 +28,7 @@ var router = express.Router();          // get an instance of the express Router
 // middleware to use for all requests
 router.use(function(req, res, next) {
     // do logging
-    console.log('Something is happening.');
+    console.log('Process executed.');
     next(); // make sure we go to the next routes and don't stop here
 });
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
@@ -54,18 +56,27 @@ router.post('/fruits', function(req, res) {
     fruit.save(function(err) {
         if (err)
             res.send(err);
-        res.json({ message: 'Fruit created!' });
+        res.status(200);
+        res.set('text/html').send("Fruit created!<br><form method='get' action='/api'><button type='submit'>Back</button></form>");
+
     });
 });
 // get all the fruits (accessed at GET http://localhost:8080/api/fruits)
 router.get('/fruits/', function(req, res) {
-        Fruit.find(function(err, fruits) {
-            if (err)
-                res.send(err);
-            res.json(fruits);
-        });
+    Fruit.find(function(err, fruits) {
+        if (err)
+            res.send(err);
+        var testing="";
+        for(var i=0;i<fruits.length-1;i++){
+            var temp="<a href='/api/fruits/"+fruits[i]._id+"'>"+fruits[i]+"</a><br>"
+            testing=testing+temp;
+        }
+        testing=testing+"<br><br><form method='get' action='/api'><button type='submit'>Back</button></form>";
+        res.status(200);
+        res.set('text/html').send(testing);
     });
-    
+});
+
     
 // on routes that end in /fruits/:fruit_id
 // ----------------------------------------------------------------------------
@@ -76,7 +87,8 @@ router.get('/fruits/:fruit_id', function(req, res) {
     Fruit.findById(req.params.fruit_id, function(err, fruit) {
         if (err)
             res.send(err);
-        res.json(fruit);
+        res.status(200);
+        res.set('text/html').send(fruit+"<br><form method='POST' action='/api/fruits/"+fruit._id+"?_method=DELETE'><button type='submit'>Delete resource</button></form>");
     });
 });
 // update the fruit with this id (accessed at PUT http://localhost:8080/api/fruits/:fruit_id)
